@@ -48,6 +48,7 @@ app.post("/certification", (req, res) => {
   console.log("/certification", req.body);
   User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
     if (err) throw err;
+    delete data.user_pw;
     console.log(data);
     res.json(resultObj(true, "Success Certification", data));
   });
