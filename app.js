@@ -9,7 +9,8 @@ const hashSecret = "!)@(#*$&^%";
 
 mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
   useNewUrlParser: true,
-  useFindAndModify: false
+  useFindAndModify: false,
+  useUnifiedTopology: true
 });
 
 const db = mongoose.connection;
