@@ -52,6 +52,7 @@ app.post("/insert", (req, res) => {
       const user = new User({ user_id: req.body.id, user_pw: hash });
       user.save((err, data) => {
         if (err) throw err;
+        delete data.user_pw;
         res.json(resultObj(true, "Success Insert", data));
       });
     } else {
