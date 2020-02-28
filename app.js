@@ -2,6 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "secret-key";
 
 mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
   useNewUrlParser: true,
@@ -27,7 +29,7 @@ const resultObj = (isSuccess, message, returnValue) => {
 const userSchema = mongoose.Schema({
   user_id: String,
   user_pw: String,
-  create_date: { type: Date, default: Date.now }
+  create_date: { type: Date, default: Date.now() }
 });
 
 const User = mongoose.model("user", userSchema);
@@ -48,10 +50,12 @@ app.post("/certification", (req, res) => {
   console.log("/certification", req.body);
   User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
     if (err) throw err;
-    for (const d of data) {
-      delete d.user_pw;
+    if (data.length === 1) {
+      const token = jwt.sign({ data: data }, SECRET_KEY, { expiresIn: "1h" });
+      res.json(resultObj(true, "Success Certification", token));
+    } else {
+      res.json(resultObj(false, "Failed Certification"));
     }
-    res.json(resultObj(true, "Success Certification", data));
   });
 });
 
