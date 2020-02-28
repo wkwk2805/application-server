@@ -4,6 +4,9 @@ const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = "secret-key";
+const crypto = require("crypto");
+
+const hashSecret = "!)@(#*$&^%";
 
 mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
   useNewUrlParser: true,
@@ -39,10 +42,14 @@ app.use(bodyParser.json());
 
 app.post("/insert", (req, res) => {
   console.log("request contents", req.body);
+  const hash = crypto
+    .createHmac("sha256", hashSecret)
+    .update(req.body.pw)
+    .digest("hex");
   User.find({ user_id: req.body.id }, function(err, data) {
     if (err) throw err;
     if (data.length === 0) {
-      const user = new User({ user_id: req.body.id, user_pw: req.body.pw });
+      const user = new User({ user_id: req.body.id, user_pw: hash });
       user.save((err, data) => {
         if (err) throw err;
         res.json(resultObj(true, "Success Insert", data));
@@ -55,7 +62,11 @@ app.post("/insert", (req, res) => {
 
 app.post("/certification", (req, res) => {
   console.log("/certification", req.body);
-  User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
+  const hash = crypto
+    .createHmac("sha256", hashSecret)
+    .update(req.body.pw)
+    .digest("hex");
+  User.find({ user_id: req.body.id, user_pw: hash }, (err, data) => {
     if (err) throw err;
     if (data.length === 1) {
       const token = jwt.sign({ data: data }, SECRET_KEY, {
