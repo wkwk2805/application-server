@@ -48,7 +48,7 @@ app.post("/certification", (req, res) => {
   console.log("/certification", req.body);
   User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
     if (err) throw err;
-    res.json(resultObj(true, "인증성공", data));
+    res.json(resultObj(true, "인증성공", data._id));
   });
 });
 
