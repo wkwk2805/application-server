@@ -10,8 +10,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
 
 const db = mongoose.connection;
 
-const handleOpen = () => console.log("➡️ connected to DB");
-const handleError = err => console.log(`❌ Error on DB Connection : ${err}`);
+const handleOpen = () => console.log("connected to DB");
+const handleError = err => console.log(`Error on DB Connection : ${err}`);
 
 db.once("open", handleOpen);
 db.on("error", handleError);
@@ -48,8 +48,9 @@ app.post("/certification", (req, res) => {
   console.log("/certification", req.body);
   User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
     if (err) throw err;
-    delete data.user_pw;
-    console.log(data);
+    for (const d of data) {
+      delete d.user_pw;
+    }
     res.json(resultObj(true, "Success Certification", data));
   });
 });
