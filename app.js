@@ -1,6 +1,20 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
+  useNewUrlParser: true,
+  useFindAndModify: false
+});
+
+const db = mongoose.connection;
+
+const handleOpen = () => console.log("➡️ connected to DB");
+const handleError = err => console.log(`❌ Error on DB Connection : ${err}`);
+
+db.once("open", handleOpen);
+db.on("error", handleError);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
