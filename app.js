@@ -40,7 +40,7 @@ app.post("/insert", (req, res) => {
   const user = new User({ user_id: req.body.id, user_pw: req.body.pw });
   user.save((err, data) => {
     if (err) throw err;
-    res.json(resultObj(true, "등록성공", data));
+    res.json(resultObj(true, "Success Insert", data));
   });
 });
 
@@ -49,7 +49,7 @@ app.post("/certification", (req, res) => {
   User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
     if (err) throw err;
     console.log(data);
-    res.json(resultObj(true, "인증성공", data));
+    res.json(resultObj(true, "Success Certification", data));
   });
 });
 
