@@ -5,7 +5,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
+app.post("/", (req, res) => {
   console.log("request contents", req.body);
   let isSuccess = false;
   let message = "message";
