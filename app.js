@@ -59,6 +59,11 @@ app.post("/certification", (req, res) => {
   });
 });
 
+app.post("/verify", (req, res) => {
+  const decode = jwt.verify(req.body.token, SECRET_KEY);
+  res.json(decode);
+});
+
 app.listen(80, () => {
   console.log("Connect! Application Server");
 });
