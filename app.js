@@ -27,7 +27,7 @@ const User = mongoose.model("user", userSchema);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
+app.post("/", (req, res) => {
   console.log("request contents", req.body);
   const user = new User({ user_id: req.body.id, user_pw: req.body.pw });
   user.save((err, data) => {
