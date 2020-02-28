@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = "secret-key";
 const crypto = require("crypto");
-
 const hashSecret = "!)@(#*$&^%";
 
 mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
@@ -52,7 +51,7 @@ app.post("/insert", (req, res) => {
       const user = new User({ user_id: req.body.id, user_pw: hash });
       user.save((err, data) => {
         if (err) throw err;
-        delete data.user_pw;
+        data.user_pw = undefined;
         res.json(resultObj(true, "Success Insert", data));
       });
     } else {
@@ -83,7 +82,7 @@ app.post("/certification", (req, res) => {
 app.post("/verify", (req, res) => {
   try {
     const decode = jwt.verify(req.body.token, SECRET_KEY);
-    delete decode.data[0].user_pw;
+    decode.data[0].user_pw = undefined;
     res.json(decode);
   } catch (e) {
     switch (e.name) {
