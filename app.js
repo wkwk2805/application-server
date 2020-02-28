@@ -51,7 +51,7 @@ app.post("/certification", (req, res) => {
   User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
     if (err) throw err;
     if (data.length === 1) {
-      const token = jwt.sign({ data: data }, SECRET_KEY, { expiresIn: "1h" });
+      const token = jwt.sign({ data: data }, SECRET_KEY, { expiresIn: "1ms" });
       res.json(resultObj(true, "Success Certification", token));
     } else {
       res.json(resultObj(false, "Failed Certification"));
@@ -61,7 +61,7 @@ app.post("/certification", (req, res) => {
 
 app.post("/verify", (req, res) => {
   const decode = jwt.verify(req.body.token, SECRET_KEY);
-  res.json(decode);
+  res.json(decode.exp);
 });
 
 app.listen(80, () => {
