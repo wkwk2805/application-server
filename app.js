@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = "secret-key";
 
-mongoose.connect("mongodb://54.180.153.41:27017/faith_book", {
+mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
   useNewUrlParser: true,
   useFindAndModify: false
 });
