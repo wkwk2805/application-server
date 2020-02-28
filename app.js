@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = "secret-key";
 
-mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
+mongoose.connect("mongodb://54.180.153.41:27017/faith_book", {
   useNewUrlParser: true,
   useFindAndModify: false
 });
@@ -39,10 +39,17 @@ app.use(bodyParser.json());
 
 app.post("/insert", (req, res) => {
   console.log("request contents", req.body);
-  const user = new User({ user_id: req.body.id, user_pw: req.body.pw });
-  user.save((err, data) => {
+  User.find({ user_id: req.body.id }, function(err, data) {
     if (err) throw err;
-    res.json(resultObj(true, "Success Insert", data));
+    if (data.length === 0) {
+      const user = new User({ user_id: req.body.id, user_pw: req.body.pw });
+      user.save((err, data) => {
+        if (err) throw err;
+        res.json(resultObj(true, "Success Insert", data));
+      });
+    } else {
+      res.json(resultObj(false, "사용자가 이미 존재합니다."));
+    }
   });
 });
 
@@ -51,7 +58,9 @@ app.post("/certification", (req, res) => {
   User.find({ user_id: req.body.id, user_pw: req.body.pw }, (err, data) => {
     if (err) throw err;
     if (data.length === 1) {
-      const token = jwt.sign({ data: data }, SECRET_KEY, { expiresIn: "1ms" });
+      const token = jwt.sign({ data: data }, SECRET_KEY, {
+        expiresIn: "1d"
+      });
       res.json(resultObj(true, "Success Certification", token));
     } else {
       res.json(resultObj(false, "Failed Certification"));
@@ -60,8 +69,23 @@ app.post("/certification", (req, res) => {
 });
 
 app.post("/verify", (req, res) => {
-  const decode = jwt.verify(req.body.token, SECRET_KEY);
-  res.json(decode.exp);
+  try {
+    const decode = jwt.verify(req.body.token, SECRET_KEY);
+    delete decode.data[0].user_pw;
+    res.json(decode);
+  } catch (e) {
+    switch (e.name) {
+      case "TokenExpiredError":
+        res.send(resultObj(false, "로그인 기간이 만료되었습니다."));
+        break;
+      case "JsonWebTokenError":
+        res.send(resultObj(false, "로그인이 불가합니다"));
+        break;
+      default:
+        res.send(e);
+        break;
+    }
+  }
 });
 
 app.listen(80, () => {
