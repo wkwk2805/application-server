@@ -1,6 +1,6 @@
-function DBConnection() {
-  const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
+const DBConnection = () => {
   mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
     useNewUrlParser: true,
     useFindAndModify: false,
@@ -14,6 +14,8 @@ function DBConnection() {
 
   db.once("open", handleOpen);
   db.on("error", handleError);
-}
+
+  return db;
+};
 
 module.exports = DBConnection;
