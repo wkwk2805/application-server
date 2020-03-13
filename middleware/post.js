@@ -1,117 +1,54 @@
-const { Post, File } = require("../database/Shemas");
-const { resultData, hashPwd } = require("../utility/common");
+const mongoose = require("mongoose");
+const { Post, User } = require("../database/Shemas");
+const { resultData } = require("../utility/common");
+const { fileInsert } = require("./file");
 const TAG = "post";
 // read
 
 // create
 const register = async (req, res) => {
   console.log(TAG, "register", req.body);
+  const session = await mongoose.startSession();
   try {
-    let pid = 0;
-    const posts = await Post.find({}).sort({ post_id: "desc" });
-    if (posts.length > 0) {
-      pid = posts[0].post_id + 1;
-    }
-    const post = new Post({
-      user_id: req.user_id,
-      post_id: pid,
-      post_content: req.body.content
-    });
+    session.startTransaction();
+    let fileArray = [];
     if (req.body.files && req.body.files.length > 0) {
-      for (path of req.body.files) {
-        let fid = 0;
-        const files = await File.find({}).sort({ file_id: "desc" });
-        if (files.length > 0) {
-          fid = files[0].file_id + 1;
-        }
-        const file = new File({
-          file_id: fid,
-          file_path: path,
-          post_id: pid
-        });
-        const f = await file.save();
-        console.log(f);
-      }
+      fileArray = await fileInsert(req.body.files, session);
     }
-    const pData = await post.save();
-    if (pData) {
-      res.json(resultData(true, "글쓰기 성공!", pData));
+    await Post.createCollection();
+    const post = await new Post({
+      author: req.user_id,
+      content: req.body.content,
+      file_ids: fileArray
+    }).save({ session });
+    await User.createCollection();
+    const user = await User.findOneAndUpdate(
+      { id: req.user_id },
+      { $push: { post_ids: post._id }, update_date: Date.now() },
+      { new: true, session }
+    );
+    if (!user) {
+      throw new Error("user가 존재하지 않음");
     }
+    await session.commitTransaction();
+    res.json(user);
   } catch (error) {
     console.error(error);
+    await session.abortTransaction();
     res.json(resultData(false, "ERROR", error));
+  } finally {
+    session.endSession();
   }
 };
+
 // update
 const modify = async (req, res) => {
   console.log(TAG, "modify");
-  try {
-    const updatedUser = await User.findOneAndUpdate(
-      { user_id: req.body.id },
-      {
-        user_name: req.body.name,
-        user_phone: req.body.phone,
-        user_email: req.body.email,
-        update_date: Date.now()
-      },
-      { new: true }
-    );
-    // 비밀번호 넘기지 않기
-    updatedUser.user_pw = undefined;
-    if (updatedUser) {
-      res.json(resultData(true, "수정되었습니다.", updatedUser));
-    } else {
-      res.json(resultData(false, "수정이 안되었습니다."));
-    }
-  } catch (e) {
-    console.error(e);
-    res.json(resultData(false, "수정이 안되었습니다.", e));
-  }
 };
-// update
-const modifyPassword = async (req, res) => {
-  console.log(TAG, "modify");
-  try {
-    const updatedUser = await User.findOneAndUpdate(
-      { user_id: req.body.id },
-      {
-        user_name: hashPwd(req.body.pw),
-        update_date: Date.now()
-      },
-      { new: true }
-    );
-    // 비밀번호 넘기지 않기
-    updatedUser.user_pw = undefined;
-    if (updatedUser) {
-      res.json(resultData(true, "수정되었습니다.", updatedUser));
-    } else {
-      res.json(resultData(false, "수정이 안되었습니다."));
-    }
-  } catch (e) {
-    console.error(e);
-    res.json(resultData(false, "수정이 안되었습니다.", e));
-  }
-};
+
 // delete
 const remove = async (req, res) => {
   console.log(TAG, "remove");
-  try {
-    const updatedUser = await User.findOneAndUpdate(
-      { user_id: req.body.id },
-      { user_del_yn: "Y" },
-      { new: true }
-    );
-    // 비밀번호 넘기지 않기
-    updatedUser.user_pw = undefined;
-    if (updatedUser) {
-      res.json(resultData(true, "수정되었습니다.", updatedUser));
-    } else {
-      res.json(resultData(false, "수정이 안되었습니다."));
-    }
-  } catch (e) {
-    console.error(e);
-    res.json(resultData(false, "수정이 안되었습니다.", e));
-  }
 };
 
 module.exports = { register, modify, remove };

@@ -1,12 +1,16 @@
 const mongoose = require("mongoose");
 
 const DBConnection = () => {
-  mongoose.connect("mongodb://127.0.0.1:27017/faith_book", {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-  });
+  mongoose.connect(
+    "mongodb://localhost:27017,localhost:27018,localhost:27019/faith_book",
+    {
+      useNewUrlParser: true,
+      useFindAndModify: false,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      replicaSet: "rs0"
+    }
+  );
 
   const db = mongoose.connection;
 

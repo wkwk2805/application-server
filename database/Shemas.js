@@ -1,70 +1,70 @@
 const mongoose = require("mongoose");
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
+const oid = mongoose.SchemaTypes.ObjectId;
 const userSchema = mongoose.Schema({
-  user_id: {
+  id: {
     type: String,
     require: true,
     unique: true,
     lowercase: true,
     trim: true
   },
-  user_pw: { type: String, require: true, trim: true },
-  user_name: String,
-  user_phone: String,
-  user_email: String,
-  user_del_yn: { type: String, default: "N" },
+  password: { type: String, require: true, trim: true },
+  name: String,
+  phone: String,
+  email: String,
+  profile_image: String,
+  file_ids: [{ type: oid, ref: "file" }],
+  post_ids: [{ type: oid, ref: "post" }],
+  be_shared_ids: [{ type: oid, ref: "post" }],
+  comment_ids: [{ type: oid, ref: "comment" }],
+  like_ids: [{ type: oid, ref: "like" }],
+  friend_ids: [{ type: oid, ref: "user" }],
+  del_yn: { type: String, default: "N" },
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
 const User = mongoose.model("user", userSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const fileShema = mongoose.Schema({
-  file_id: { type: Number, require: true, unique: true },
-  file_path: String,
-  user_id: { type: String, ref: "user" },
-  post_id: { type: Number, ref: "post" },
+  name: { type: String, require: true },
+  path: { type: String, require: true },
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
 const File = mongoose.model("file", fileShema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const postShema = mongoose.Schema({
-  post_id: { type: Number, require: true, unique: true },
-  post_content: String,
-  user_id: { type: String, ref: "user" },
+  content: { type: String, require: true },
+  author: { type: String, require: true },
+  comment_ids: [{ type: oid, ref: "comment" }],
+  like_ids: [{ type: oid, ref: "like" }],
+  file_ids: [{ type: oid, ref: "file" }],
+  share_ids: [{ type: oid, ref: "share" }],
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
 const Post = mongoose.model("post", postShema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const likeShema = mongoose.Schema({
-  like_id: { type: Number, require: true, unique: true },
-  post_id: { type: Number, ref: "post" },
-  user_id: { type: String, ref: "user" },
-  comment_id: { type: Number, ref: "comment" },
+  author: { type: String, require: true },
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
 const Like = mongoose.model("like", likeShema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const commentShema = mongoose.Schema({
-  comment_id: { type: Number, require: true, unique: true },
-  comment_contents: String,
-  post_id: { type: Number, ref: "post" },
-  user_id: { type: String, ref: "user" },
+  content: { type: String, require: true },
+  author: { type: String, require: true },
+  like_ids: [{ type: oid, ref: "like" }],
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
 const Comment = mongoose.model("comment", commentShema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const friendShema = mongoose.Schema({
-  friend_id: { type: Number, require: true, unique: true },
-  user_id_1: { type: String, require: true, ref: "user" },
-  user_id_2: { type: String, require: true, ref: "user" },
-  friend_yn: String,
-  create_date: { type: Date, default: Date.now() },
-  update_date: Date
+const shareSchema = mongoose.Schema({
+  shared_user: { type: oid, ref: "user" },
+  share_date: { type: Date, default: Date.now() }
 });
-const Friend = mongoose.model("friend", friendShema);
-
-module.exports = { User, File, Post, Like, Comment, Friend };
+const Share = mongoose.model("share", shareSchema);
+module.exports = { User, File, Post, Like, Comment, Share };

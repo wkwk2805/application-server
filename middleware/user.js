@@ -12,6 +12,7 @@ const modify = async (req, res) => {
         user_name: req.body.name,
         user_phone: req.body.phone,
         user_email: req.body.email,
+        /* user_profile_image: req.body ,*/
         update_date: Date.now()
       },
       { new: true }
@@ -28,7 +29,7 @@ const modify = async (req, res) => {
     res.json(resultData(false, "수정이 안되었습니다.", e));
   }
 };
-// update
+// 비밀번호 변경
 const modifyPassword = async (req, res) => {
   console.log(TAG, "modify");
   try {
@@ -52,7 +53,7 @@ const modifyPassword = async (req, res) => {
     res.json(resultData(false, "수정이 안되었습니다.", e));
   }
 };
-// delete
+// 유저제거
 const remove = async (req, res) => {
   console.log(TAG, "remove");
   try {

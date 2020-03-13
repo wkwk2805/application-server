@@ -1,13 +1,13 @@
 const { User } = require("../database/Shemas");
 const { hashPwd, SECRET_KEY, resultData } = require("../utility/common");
 const jwt = require("jsonwebtoken");
-const TAG = "auth";
+const TAG = "middleware/auth.js/";
 
 // login
 const login = (req, res) => {
   console.log(TAG, "/login", req.body);
   User.find(
-    { user_id: req.body.id, user_pw: hashPwd(req.body.pw) },
+    { id: req.body.id, password: hashPwd(req.body.password) },
     (err, data) => {
       if (err) throw err;
       if (data.length === 1) {
@@ -26,10 +26,11 @@ const verify = (req, res, next) => {
   try {
     console.log(TAG, "verify");
     const decode = jwt.verify(req.headers.token, SECRET_KEY);
-    decode.data[0].user_pw = undefined;
-    req.user_id = decode.data[0].user_id;
+    decode.data[0].password = undefined;
+    req.user_id = decode.data[0].id;
     next();
   } catch (e) {
+    console.error(e);
     switch (e.name) {
       case "TokenExpiredError":
         return res.json(resultData(false, "로그인 기간이 만료되었습니다."));
@@ -45,16 +46,16 @@ const verify = (req, res, next) => {
 // 회원가입 - 여기에 한 이유는 app.use(verify)를 사용하기 위해서
 const register = (req, res) => {
   console.log(TAG, "register", req.body);
-  User.find({ user_id: req.body.id }, function(err, data) {
+  User.find({ id: req.body.id }, function(err, data) {
     if (err) throw err;
     if (data.length === 0) {
       const user = new User({
-        user_id: req.body.id,
-        user_pw: hashPwd(req.body.pw)
+        id: req.body.id,
+        password: hashPwd(req.body.password)
       });
       user.save((err, data) => {
         if (err) throw err;
-        data.user_pw = undefined;
+        data.password = undefined;
         res.json(resultData(true, "Success Insert", data));
       });
     } else {
