@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 const { Comment, Post } = require("../database/Shemas");
 // read
-
+const TAG = "/middleware/comment.js/"
 // create
 const create = async (req, res) => {
+  console.log(TAG,"create")
   await Comment.createCollection();
   const session = await mongoose.startSession();
   try {
@@ -13,7 +14,7 @@ const create = async (req, res) => {
       author: req.user_id
     }).save(session);
     const post = await Post.findByIdAndUpdate(
-      req.body._id,
+      req.body.post_id,
       {
         $push: { comment_ids: comment._id }
       },
@@ -34,18 +35,15 @@ const modify = async (req, res) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const comment = await new Comment({
-      content: req.body.content,
-      author: req.user_id
-    }).save(session);
-    const post = await Post.findByIdAndUpdate(
-      req.body._id,
+    const comment = await Comment.findByIdAndUpdate(
+      req.body.comment_id,
       {
-        $push: { comment_ids: comment._id }
+        content: req.body.content,
+        update_date: Date.now()
       },
       { new: true, session }
     );
-    res.json(post);
+    res.json(comment);
     await session.commitTransaction();
   } catch (error) {
     console.log(error);
@@ -55,4 +53,9 @@ const modify = async (req, res) => {
   }
 };
 // delete
+const remove = (req,res) => {
+  console.log(TAG, "remove");
+  const comment = await Comment.findByIdAndRemove(req.body.comment_id);
+  res.json(comment);
+}
 module.exports = { create, modify };

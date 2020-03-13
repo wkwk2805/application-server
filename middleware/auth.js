@@ -1,7 +1,7 @@
 const { User } = require("../database/Shemas");
 const { hashPwd, SECRET_KEY, resultData } = require("../utility/common");
 const jwt = require("jsonwebtoken");
-const TAG = "middleware/auth.js/";
+const TAG = "/middleware/auth.js/";
 
 // login
 const login = (req, res) => {

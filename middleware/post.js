@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Post, User } = require("../database/Shemas");
 const { resultData } = require("../utility/common");
 const { fileInsert } = require("./file");
-const TAG = "post";
+const TAG = "/middleware/post.js/";
 // read
 
 // create
@@ -55,7 +55,7 @@ const modify = async (req, res) => {
     // 새로운 파일이 들어간 데이터로 변환
     await Post.createCollection();
     const post = await Post.findByIdAndUpdate(
-      req.body._id,
+      req.body.post_id,
       {
         content: req.body.content,
         file_ids: fileArray,
@@ -77,7 +77,7 @@ const modify = async (req, res) => {
 // delete
 const remove = async (req, res) => {
   console.log(TAG, "remove");
-  const removedPost = await Post.findByIdAndRemove(req.body._id);
+  const removedPost = await Post.findByIdAndRemove(req.body.post_id);
   res.json(removedPost);
 };
 

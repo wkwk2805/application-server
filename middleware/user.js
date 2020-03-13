@@ -1,6 +1,6 @@
 const { User } = require("../database/Shemas");
 const { resultData, hashPwd } = require("../utility/common");
-const TAG = "user";
+const TAG = "/middleware/user.js/";
 
 // update
 const modify = async (req, res) => {
