@@ -1,7 +1,8 @@
 const router = require("express").Router();
-const { modify, remove, getPostsByUser } = require("../middleware/user");
+const { modify, remove } = require("../middleware/user");
+const { getPostsByAllUser } = require("../read/userSelect");
 // read
-router.post("/", getPostsByUser);
+router.post("/", getPostsByAllUser);
 // update
 router.patch("/", modify);
 // delete

@@ -1,12 +1,6 @@
-const { User, Post } = require("../database/Shemas");
+const { User } = require("../database/Shemas");
 const { resultData, hashPwd } = require("../utility/common");
 const TAG = "user";
-// read
-const getPostsByUser = async (req, res) => {
-  console.log(TAG, "getPostsByUser");
-  const posts = await Post.find({ user_id: req.user_id });
-  res.json(posts);
-};
 
 // update
 const modify = async (req, res) => {
@@ -80,4 +74,4 @@ const remove = async (req, res) => {
   }
 };
 // export
-module.exports = { modify, remove, modifyPassword, getPostsByUser };
+module.exports = { modify, remove, modifyPassword };
