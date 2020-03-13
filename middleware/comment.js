@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const { Comment, Post } = require("../database/Shemas");
 // read
-const TAG = "/middleware/comment.js/"
+const TAG = "/middleware/comment.js/";
 // create
 const create = async (req, res) => {
-  console.log(TAG,"create")
+  console.log(TAG, "create");
   await Comment.createCollection();
   const session = await mongoose.startSession();
   try {
@@ -53,9 +53,9 @@ const modify = async (req, res) => {
   }
 };
 // delete
-const remove = (req,res) => {
+const remove = async (req, res) => {
   console.log(TAG, "remove");
   const comment = await Comment.findByIdAndRemove(req.body.comment_id);
   res.json(comment);
-}
-module.exports = { create, modify };
+};
+module.exports = { create, modify, remove };

@@ -7,12 +7,12 @@ const modify = async (req, res) => {
   console.log(TAG, "modify");
   try {
     const updatedUser = await User.findOneAndUpdate(
-      { user_id: req.body.id },
+      { id: req.body.id },
       {
-        user_name: req.body.name,
-        user_phone: req.body.phone,
-        user_email: req.body.email,
-        /* user_profile_image: req.body ,*/
+        name: req.body.name,
+        phone: req.body.phone,
+        email: req.body.email,
+        $push: { images: req.body.image },
         update_date: Date.now()
       },
       { new: true }
@@ -34,7 +34,7 @@ const modifyPassword = async (req, res) => {
   console.log(TAG, "modify");
   try {
     const updatedUser = await User.findOneAndUpdate(
-      { user_id: req.body.id },
+      { id: req.body.id },
       {
         user_name: hashPwd(req.body.pw),
         update_date: Date.now()
@@ -58,12 +58,12 @@ const remove = async (req, res) => {
   console.log(TAG, "remove");
   try {
     const updatedUser = await User.findOneAndUpdate(
-      { user_id: req.body.id },
-      { user_del_yn: "Y" },
+      { id: req.body.id },
+      { del_yn: "Y" },
       { new: true }
     );
     // 비밀번호 넘기지 않기
-    updatedUser.user_pw = undefined;
+    updatedUser.password = undefined;
     if (updatedUser) {
       res.json(resultData(true, "수정되었습니다.", updatedUser));
     } else {
