@@ -18,7 +18,7 @@ const modify = async (req, res) => {
       { new: true }
     );
     // 비밀번호 넘기지 않기
-    updatedUser.user_pw = undefined;
+    updatedUser.password = undefined;
     if (updatedUser) {
       res.json(resultData(true, "수정되었습니다.", updatedUser));
     } else {
@@ -42,7 +42,7 @@ const modifyPassword = async (req, res) => {
       { new: true }
     );
     // 비밀번호 넘기지 않기
-    updatedUser.user_pw = undefined;
+    updatedUser.password = undefined;
     if (updatedUser) {
       res.json(resultData(true, "수정되었습니다.", updatedUser));
     } else {

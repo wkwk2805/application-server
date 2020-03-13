@@ -3,9 +3,9 @@ const { File } = require("../database/Shemas");
 const TAG = "file";
 // create
 const fileInsert = async (fileList, session) => {
-  await File.createCollection();
   console.log(TAG, "fileInsert");
-  let fileArray = [];
+  await File.createCollection();
+  const fileArray = [];
   for (f of fileList) {
     const file = await new File({
       name: f.name,
@@ -15,7 +15,5 @@ const fileInsert = async (fileList, session) => {
   }
   return fileArray;
 };
-// update
 
-// delete
 module.exports = { fileInsert };
