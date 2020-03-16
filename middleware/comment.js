@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Comment, Post, Like } = require("../database/Shemas");
+const { Comment, Post, Like, News } = require("../database/Shemas");
 // read
 const TAG = "/middleware/comment.js/";
 // create
@@ -20,6 +20,10 @@ const create = async (req, res) => {
       },
       { new: true, session }
     );
+    await new News({
+      comment_id: comment._id,
+      author: req.user_id
+    }).save();
     if (!post) {
       throw new Error("글이 존재하지 않음");
     }

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Post, User, Comment, Like } = require("../database/Shemas");
+const { Post, User, Comment, Like, News } = require("../database/Shemas");
 const { resultData, removeIds } = require("../utility/common");
 const { fileInsert } = require("./file");
 const TAG = "/middleware/post.js/";
@@ -21,6 +21,11 @@ const register = async (req, res) => {
       content: req.body.content,
       file_ids: fileArray
     }).save({ session });
+    await News.createCollection();
+    await new News({
+      post_id: post._id,
+      author: req.user_id
+    }).save();
     await User.createCollection();
     const user = await User.findOneAndUpdate(
       { _id: req.user_id },

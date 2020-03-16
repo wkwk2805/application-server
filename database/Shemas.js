@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   images: [String],
   post_ids: [{ type: oid, ref: "post" }],
+  authority: [{ type: String }],
   be_shared_ids: [{ type: oid, ref: "post" }],
   comment_ids: [{ type: oid, ref: "comment" }],
   like_ids: [{ type: oid, ref: "like" }],
@@ -38,6 +39,9 @@ const postSchema = new mongoose.Schema({
   content: { type: String, require: true },
   author: { type: oid, require: true, ref: "user" },
   comment_ids: [{ type: oid, ref: "comment" }],
+  /*Category ALL, CHURCH, FRIEND, CELL, LEADER, 등등 */
+  categories: [{ type: String, default: "ALL" }], // Category 이름을 스스로 정해서 사용할 수 있도록 한다
+  tags: [String],
   like_ids: [{ type: oid, ref: "like" }],
   file_ids: [{ type: oid, ref: "file" }],
   share_ids: [{ type: oid, ref: "share" }],
@@ -71,4 +75,15 @@ const shareSchema = new mongoose.Schema({
   share_date: { type: Date, default: Date.now() }
 });
 const Share = mongoose.model("share", shareSchema);
-module.exports = { User, File, Post, Like, Comment, Share };
+// !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
+const newsSchema = new mongoose.Schema({
+  post_id: { type: oid, ref: "post" },
+  like_id: { type: oid, ref: "like" },
+  comment_id: { type: oid, ref: "comment" },
+  is_new: { type: String, default: "Y" },
+  author: { type: oid, ref: "user" },
+  create_date: { type: Date, default: Date.now() },
+  update_date: Date
+});
+const News = mongoose.model("news", newsSchema);
+module.exports = { User, File, Post, Like, Comment, Share, News };

@@ -1,4 +1,4 @@
-const { Like, Post, Comment } = require("../database/Shemas");
+const { Like, Post, Comment, News } = require("../database/Shemas");
 const { resultData } = require("../utility/common");
 const TAG = "/middleware/like.js";
 // 글 좋아요 눌렀을 때
@@ -35,6 +35,11 @@ const pushPostLikeButton = async (req, res) => {
         { new: true }
       );
       if (like.ok === 1) {
+        await new News({
+          post_id: post._id,
+          like_id: like._id,
+          author: req.user_id
+        }).save();
         console.log("글의 좋아요 수", post.like_ids.length);
         res.json(resultData(true, "like추가", post.like_ids.length));
       }
@@ -63,7 +68,6 @@ const pushCommentLikeButton = async (req, res) => {
     if (comment) {
       const like = await Like.deleteOne({ _id: isComment.like_ids[0] });
       console.log("댓글의 좋아요 수", comment.like_ids.length);
-      console.log(like);
       if (like.ok === 1) {
         res.json(resultData(true, "like제거", comment.like_ids.length));
       }
@@ -77,6 +81,11 @@ const pushCommentLikeButton = async (req, res) => {
         { $push: { like_ids: like._id } },
         { new: true }
       );
+      await new News({
+        comment_id: comment._id,
+        like_id: like._id,
+        author: req.user_id
+      }).save();
       console.log("댓글의 좋아요 수", comment.like_ids.length);
       res.json(resultData(true, "like추가", comment.like_ids.length));
     }
