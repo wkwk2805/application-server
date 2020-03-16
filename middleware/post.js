@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const { Post, User, Comment, Like, News } = require("../database/Shemas");
-const { resultData, removeIds } = require("../utility/common");
+const { Post, User, News } = require("../database/Shemas");
+const { resultData } = require("../utility/common");
 const { fileInsert } = require("./file");
 const TAG = "/middleware/post.js/";
 // read

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Comment, Post, Like, News } = require("../database/Shemas");
+const { Comment, Post, News } = require("../database/Shemas");
 // read
 const TAG = "/middleware/comment.js/";
 // create

@@ -80,6 +80,8 @@ const newsSchema = new mongoose.Schema({
   post_id: { type: oid, ref: "post" },
   like_id: { type: oid, ref: "like" },
   comment_id: { type: oid, ref: "comment" },
+  friend_id: { type: oid, ref: "user" },
+  friend_yn: { type: String, default: "N" },
   is_new: { type: String, default: "Y" },
   author: { type: oid, ref: "user" },
   create_date: { type: Date, default: Date.now() },
