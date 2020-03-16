@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   be_shared_ids: [{ type: oid, ref: "post" }],
   comment_ids: [{ type: oid, ref: "comment" }],
   like_ids: [{ type: oid, ref: "like" }],
-  friend_ids: [{ type: oid, ref: "user" }],
+  friend_ids: [{ type: oid, ref: "friend" }],
   del_yn: { type: String, default: "N" },
   create_date: { type: Date, default: Date.now() },
   update_date: Date,
@@ -88,4 +88,12 @@ const newsSchema = new mongoose.Schema({
   update_date: Date
 });
 const News = mongoose.model("news", newsSchema);
-module.exports = { User, File, Post, Like, Comment, Share, News };
+const friendSchema = new mongoose.Schema({
+  user_id: { type: oid, ref: "user" },
+  friend_id: { type: oid, ref: "user" },
+  friend_yn: { type: String, default: "N" },
+  friend_cancel: String,
+  friend_block: { type: String, default: "N" }
+});
+const Friend = mongoose.model("friend", friendSchema);
+module.exports = { User, File, Post, Like, Comment, Share, News, Friend };
