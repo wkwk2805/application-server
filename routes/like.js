@@ -1,7 +1,13 @@
-// read
+const router = require("express").Router();
+const {
+  pushCommentLikeButton,
+  pushPostLikeButton
+} = require("../middleware/like");
 
-// create
+// 글에 대하여 좋아요 눌렀을 때
+router.patch("/post", pushPostLikeButton);
 
-// update
+// 댓글에 대하여 좋아요 눌렀을 때
+router.patch("/comment", pushCommentLikeButton);
 
-// delete
+module.exports = router;

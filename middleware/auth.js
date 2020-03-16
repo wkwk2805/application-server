@@ -30,7 +30,7 @@ const verify = async (req, res, next) => {
     const id = decode.data[0].id;
     const data = await User.find({ id: id, password: password });
     if (data.length === 1) {
-      req.user_id = id;
+      req.user_id = decode.data[0]._id;
       next();
     } else {
       throw new Error("로그인이 불가합니다.");

@@ -23,7 +23,7 @@ const register = async (req, res) => {
     }).save({ session });
     await User.createCollection();
     const user = await User.findOneAndUpdate(
-      { id: req.user_id },
+      { _id: req.user_id },
       { $push: { post_ids: post._id }, update_date: Date.now() },
       { new: true, session }
     );

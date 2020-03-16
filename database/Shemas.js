@@ -24,9 +24,6 @@ const userSchema = new mongoose.Schema({
   update_date: Date,
   delete_date: Date
 });
-userSchema.post("remove", doc => {
-  console.log("removed", doc);
-});
 const User = mongoose.model("user", userSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const fileSchema = new mongoose.Schema({
@@ -39,7 +36,7 @@ const File = mongoose.model("file", fileSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const postSchema = new mongoose.Schema({
   content: { type: String, require: true },
-  author: { type: String, require: true },
+  author: { type: oid, require: true, ref: "user" },
   comment_ids: [{ type: oid, ref: "comment" }],
   like_ids: [{ type: oid, ref: "like" }],
   file_ids: [{ type: oid, ref: "file" }],
@@ -52,7 +49,7 @@ const postSchema = new mongoose.Schema({
 const Post = mongoose.model("post", postSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const likeSchema = new mongoose.Schema({
-  author: { type: String, require: true },
+  author: { type: oid, require: true, ref: "user" },
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
@@ -60,7 +57,7 @@ const Like = mongoose.model("like", likeSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const commentSchema = new mongoose.Schema({
   content: { type: String, require: true },
-  author: { type: String, require: true },
+  author: { type: oid, require: true, ref: "user" },
   like_ids: [{ type: oid, ref: "like" }],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
