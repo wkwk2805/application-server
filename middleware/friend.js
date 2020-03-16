@@ -1,21 +1,16 @@
 // import
-const express = require("express");
-const router = express.Router();
-const TAG = "Friend";
+const TAG = "/middleware/friend.js";
 // create
-router.put("/", (req, res) => {
-  console.log(TAG, "insert");
-  res.json("insert");
-});
+const create = (req, res) => {
+  console.log(TAG, "create");
+};
 // update
-router.patch("/", (req, res) => {
-  console.log(TAG, "update");
-  res.json("update");
-});
+const modify = (req, res) => {
+  console.log(TAG, "modify");
+};
 // delete
-router.delete("/", (req, res) => {
-  console.log(TAG, "delete");
-  res.json("delete");
-});
+const remove = (req, res) => {
+  console.log(TAG, "remove");
+};
 // export
-module.exports = router;
+module.exports = { create, modify, remove };

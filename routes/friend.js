@@ -1,21 +1,12 @@
 // import
 const express = require("express");
 const router = express.Router();
-const TAG = "Friend";
+const { create, modify, remove } = require("../middleware/friend");
 // create
-router.put("/", (req, res) => {
-  console.log(TAG, "insert");
-  res.json("insert");
-});
+router.put("/", create);
 // update
-router.patch("/", (req, res) => {
-  console.log(TAG, "update");
-  res.json("update");
-});
+router.patch("/", modify);
 // delete
-router.delete("/", (req, res) => {
-  console.log(TAG, "delete");
-  res.json("delete");
-});
+router.delete("/", remove);
 // export
 module.exports = router;

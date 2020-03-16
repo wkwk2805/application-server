@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const { Post, User } = require("../database/Shemas");
-const { resultData } = require("../utility/common");
+const { Post, User, Comment, Like } = require("../database/Shemas");
+const { resultData, removeIds } = require("../utility/common");
 const { fileInsert } = require("./file");
 const TAG = "/middleware/post.js/";
 // read
@@ -10,7 +10,7 @@ const register = async (req, res) => {
   console.log(TAG, "register", req.body);
   const session = await mongoose.startSession();
   try {
-    session.startTransaction();
+    session.startTransaction({ readConcern: { level: "snapshot" } });
     let fileArray = [];
     if (req.body.files && req.body.files.length > 0) {
       fileArray = await fileInsert(req.body.files, session);
@@ -31,7 +31,7 @@ const register = async (req, res) => {
       throw new Error("user가 존재하지 않음");
     }
     await session.commitTransaction();
-    res.json(user);
+    res.json(post);
   } catch (error) {
     console.error(error);
     await session.abortTransaction();
@@ -46,7 +46,7 @@ const modify = async (req, res) => {
   console.log(TAG, "modify");
   const session = await mongoose.startSession();
   try {
-    session.startTransaction();
+    session.startTransaction({ readConcern: { level: "snapshot" } });
     // 새로운 파일로 override
     let fileArray = [];
     if (req.body.files && req.body.files.length > 0) {
@@ -77,7 +77,10 @@ const modify = async (req, res) => {
 // delete
 const remove = async (req, res) => {
   console.log(TAG, "remove");
-  const removedPost = await Post.findByIdAndRemove(req.body.post_id);
+  const removedPost = await Post.findByIdAndUpdate(req.body.post_id, {
+    del_yn: "Y",
+    delete_date: Date.now()
+  });
   res.json(removedPost);
 };
 

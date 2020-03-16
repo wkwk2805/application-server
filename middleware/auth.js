@@ -22,13 +22,19 @@ const login = (req, res) => {
   );
 };
 // verify
-const verify = (req, res, next) => {
+const verify = async (req, res, next) => {
   try {
     console.log(TAG, "verify");
     const decode = jwt.verify(req.headers.token, SECRET_KEY);
-    decode.data[0].password = undefined;
-    req.user_id = decode.data[0].id;
-    next();
+    const password = decode.data[0].password;
+    const id = decode.data[0].id;
+    const data = await User.find({ id: id, password: password });
+    if (data.length === 1) {
+      req.user_id = id;
+      next();
+    } else {
+      throw new Error("로그인이 불가합니다.");
+    }
   } catch (e) {
     console.error(e);
     switch (e.name) {
@@ -37,7 +43,7 @@ const verify = (req, res, next) => {
       case "JsonWebTokenError":
         return res.json(resultData(false, "로그인이 불가합니다"));
       default:
-        return res.json(resultData(false, "ERROR", e));
+        return res.json(resultData(false, "ERROR", e.toString()));
     }
   }
 };

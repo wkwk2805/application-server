@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Comment, Post } = require("../database/Shemas");
+const { Comment, Post, Like } = require("../database/Shemas");
 // read
 const TAG = "/middleware/comment.js/";
 // create
@@ -8,7 +8,7 @@ const create = async (req, res) => {
   await Comment.createCollection();
   const session = await mongoose.startSession();
   try {
-    session.startTransaction();
+    session.startTransaction({ readConcern: { level: "snapshot" } });
     const comment = await new Comment({
       content: req.body.content,
       author: req.user_id
@@ -20,7 +20,10 @@ const create = async (req, res) => {
       },
       { new: true, session }
     );
-    res.json(post);
+    if (!post) {
+      throw new Error("글이 존재하지 않음");
+    }
+    res.json(comment);
     await session.commitTransaction();
   } catch (error) {
     console.log(error);
@@ -31,31 +34,24 @@ const create = async (req, res) => {
 };
 // update
 const modify = async (req, res) => {
-  await Comment.createCollection();
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction();
-    const comment = await Comment.findByIdAndUpdate(
-      req.body.comment_id,
-      {
-        content: req.body.content,
-        update_date: Date.now()
-      },
-      { new: true, session }
-    );
-    res.json(comment);
-    await session.commitTransaction();
-  } catch (error) {
-    console.log(error);
-    await session.abortTransaction();
-  } finally {
-    session.endSession();
-  }
+  console.log(TAG, "modify");
+  const comment = await Comment.findByIdAndUpdate(
+    req.body.comment_id,
+    {
+      content: req.body.content,
+      update_date: Date.now()
+    },
+    { new: true, session }
+  );
+  res.json(comment);
 };
 // delete
 const remove = async (req, res) => {
   console.log(TAG, "remove");
-  const comment = await Comment.findByIdAndRemove(req.body.comment_id);
+  const comment = await Comment.deleteOne(
+    { _id: req.body.comment_id },
+    { del_yn: "Y", delete_date: Date.now() }
+  );
   res.json(comment);
 };
 module.exports = { create, modify, remove };

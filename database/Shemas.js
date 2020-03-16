@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const oid = mongoose.SchemaTypes.ObjectId;
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   id: {
     type: String,
     require: true,
@@ -21,19 +21,23 @@ const userSchema = mongoose.Schema({
   friend_ids: [{ type: oid, ref: "user" }],
   del_yn: { type: String, default: "N" },
   create_date: { type: Date, default: Date.now() },
-  update_date: Date
+  update_date: Date,
+  delete_date: Date
+});
+userSchema.post("remove", doc => {
+  console.log("removed", doc);
 });
 const User = mongoose.model("user", userSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const fileShema = mongoose.Schema({
+const fileSchema = new mongoose.Schema({
   name: { type: String, require: true },
   path: { type: String, require: true },
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
-const File = mongoose.model("file", fileShema);
+const File = mongoose.model("file", fileSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const postShema = mongoose.Schema({
+const postSchema = new mongoose.Schema({
   content: { type: String, require: true },
   author: { type: String, require: true },
   comment_ids: [{ type: oid, ref: "comment" }],
@@ -41,27 +45,31 @@ const postShema = mongoose.Schema({
   file_ids: [{ type: oid, ref: "file" }],
   share_ids: [{ type: oid, ref: "share" }],
   create_date: { type: Date, default: Date.now() },
+  del_yn: { type: String, default: "N" },
+  delete_date: Date,
   update_date: Date
 });
-const Post = mongoose.model("post", postShema);
+const Post = mongoose.model("post", postSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const likeShema = mongoose.Schema({
+const likeSchema = new mongoose.Schema({
   author: { type: String, require: true },
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
-const Like = mongoose.model("like", likeShema);
+const Like = mongoose.model("like", likeSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const commentShema = mongoose.Schema({
+const commentSchema = new mongoose.Schema({
   content: { type: String, require: true },
   author: { type: String, require: true },
   like_ids: [{ type: oid, ref: "like" }],
   create_date: { type: Date, default: Date.now() },
+  del_yn: { type: String, default: "N" },
+  delete_date: Date,
   update_date: Date
 });
-const Comment = mongoose.model("comment", commentShema);
+const Comment = mongoose.model("comment", commentSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const shareSchema = mongoose.Schema({
+const shareSchema = new mongoose.Schema({
   shared_user: { type: oid, ref: "user" },
   share_date: { type: Date, default: Date.now() }
 });
