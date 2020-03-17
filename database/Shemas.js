@@ -77,11 +77,7 @@ const shareSchema = new mongoose.Schema({
 const Share = mongoose.model("share", shareSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const newsSchema = new mongoose.Schema({
-  post_id: { type: oid, ref: "post" },
-  like_id: { type: oid, ref: "like" },
-  comment_id: { type: oid, ref: "comment" },
-  friend_id: { type: oid, ref: "user" },
-  friend_yn: { type: String, default: "N" },
+  message: { type: String, require: true },
   is_new: { type: String, default: "Y" },
   author: { type: oid, ref: "user" },
   create_date: { type: Date, default: Date.now() },

@@ -22,9 +22,10 @@ const register = async (req, res) => {
       file_ids: fileArray
     }).save({ session });
     await News.createCollection();
+    const userId = (await User.findOne({ _id: post.author })).id;
     await new News({
-      post_id: post._id,
-      author: req.user_id
+      message: `${userId}님이 게시글을 올렸습니다.`,
+      author: post.author
     }).save();
     await User.createCollection();
     const user = await User.findOneAndUpdate(
