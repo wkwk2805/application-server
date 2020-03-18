@@ -6,13 +6,13 @@ const TAG = "/middleware/user.js/";
 const modify = async (req, res) => {
   console.log(TAG, "modify");
   try {
-    const updatedUser = await User.findOneAndUpdate(
+    const updatedUser = await User.updateOne(
       { id: req.body.id },
       {
         name: req.body.name,
         phone: req.body.phone,
         email: req.body.email,
-        $push: { images: req.body.image },
+        $push: { files: req.body.files },
         update_date: Date.now()
       },
       { new: true }
@@ -74,5 +74,30 @@ const remove = async (req, res) => {
     res.json(resultData(false, "수정이 안되었습니다.", e));
   }
 };
+const follow = async (req, res) => {
+  console.log(TAG, "follow");
+  console.log(req.user_id);
+  console.log(req.body.friend_id);
+  const friend = await User.findOne({
+    _id: req.body.friend_id,
+    "friends.user": req.body.friend_id
+  });
+  if (friend) {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.user_id, "friends.user": req.body.friend_id },
+      { $set: { "friends.status": "Y" } },
+      { new: true }
+    );
+    res.json(updatedUser);
+  } else {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.user_id },
+      { $push: { friends: { user: req.body.friend_id } } },
+      { new: true }
+    );
+    res.json(updatedUser);
+  }
+};
+
 // export
-module.exports = { modify, remove, modifyPassword };
+module.exports = { modify, remove, modifyPassword, follow };

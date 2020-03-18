@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { modify, remove } = require("../middleware/user");
+const { modify, remove, follow } = require("../middleware/user");
 const { getPostsByAllUser } = require("../read/userSelect");
 // read
 router.post("/", getPostsByAllUser);
@@ -7,5 +7,7 @@ router.post("/", getPostsByAllUser);
 router.patch("/", modify);
 // delete
 router.delete("/", remove);
+// follow
+router.put("/follow", follow);
 // export
 module.exports = router;

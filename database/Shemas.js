@@ -13,13 +13,20 @@ const userSchema = new mongoose.Schema({
   name: String,
   phone: String,
   email: String,
-  images: [String],
-  post_ids: [{ type: oid, ref: "post" }],
-  authority: [{ type: String }],
-  be_shared_ids: [{ type: oid, ref: "post" }],
-  comment_ids: [{ type: oid, ref: "comment" }],
-  like_ids: [{ type: oid, ref: "like" }],
-  friend_ids: [{ type: oid, ref: "friend" }],
+  files: [
+    {
+      name: { type: String },
+      path: { type: String },
+      create_date: { type: Date, default: Date.now() }
+    }
+  ],
+  friends: [
+    {
+      user: { type: oid, ref: "user" },
+      create_date: { type: Date, default: Date.now() },
+      status: { type: String, default: "N" }
+    }
+  ],
   del_yn: { type: String, default: "N" },
   create_date: { type: Date, default: Date.now() },
   update_date: Date,
@@ -27,24 +34,30 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("user", userSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const fileSchema = new mongoose.Schema({
-  name: { type: String, require: true },
-  path: { type: String, require: true },
-  create_date: { type: Date, default: Date.now() },
-  update_date: Date
-});
-const File = mongoose.model("file", fileSchema);
-// !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const postSchema = new mongoose.Schema({
   content: { type: String, require: true },
   author: { type: oid, require: true, ref: "user" },
-  comment_ids: [{ type: oid, ref: "comment" }],
-  /*Category ALL, CHURCH, FRIEND, CELL, LEADER, 등등 */
   categories: [{ type: String, default: "ALL" }], // Category 이름을 스스로 정해서 사용할 수 있도록 한다
   tags: [String],
-  like_ids: [{ type: oid, ref: "like" }],
-  file_ids: [{ type: oid, ref: "file" }],
-  share_ids: [{ type: oid, ref: "share" }],
+  likes: [
+    {
+      user: { type: oid, ref: "user" },
+      create_date: { type: Date, default: Date.now() }
+    }
+  ],
+  files: [
+    {
+      name: { type: String },
+      path: { type: String },
+      create_date: { type: Date, default: Date.now() }
+    }
+  ],
+  shares: [
+    {
+      user: { type: oid, ref: "user" },
+      create_date: { type: Date, default: Date.now() }
+    }
+  ],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
   delete_date: Date,
@@ -52,29 +65,22 @@ const postSchema = new mongoose.Schema({
 });
 const Post = mongoose.model("post", postSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const likeSchema = new mongoose.Schema({
-  author: { type: oid, require: true, ref: "user" },
-  create_date: { type: Date, default: Date.now() },
-  update_date: Date
-});
-const Like = mongoose.model("like", likeSchema);
-// !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const commentSchema = new mongoose.Schema({
   content: { type: String, require: true },
   author: { type: oid, require: true, ref: "user" },
-  like_ids: [{ type: oid, ref: "like" }],
+  post_ids: { type: oid, require: true, ref: "post" },
+  likes: [
+    {
+      user: { type: oid, ref: "user" },
+      create_date: { type: Date, default: Date.now() }
+    }
+  ],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
   delete_date: Date,
   update_date: Date
 });
 const Comment = mongoose.model("comment", commentSchema);
-// !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
-const shareSchema = new mongoose.Schema({
-  shared_user: { type: oid, ref: "user" },
-  share_date: { type: Date, default: Date.now() }
-});
-const Share = mongoose.model("share", shareSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const newsSchema = new mongoose.Schema({
   message: { type: String, require: true },
@@ -84,12 +90,5 @@ const newsSchema = new mongoose.Schema({
   update_date: Date
 });
 const News = mongoose.model("news", newsSchema);
-const friendSchema = new mongoose.Schema({
-  user_id: { type: oid, ref: "user" },
-  friend_id: { type: oid, ref: "user" },
-  friend_yn: { type: String, default: "N" },
-  friend_cancel: String,
-  friend_block: { type: String, default: "N" }
-});
-const Friend = mongoose.model("friend", friendSchema);
-module.exports = { User, File, Post, Like, Comment, Share, News, Friend };
+
+module.exports = { User, Post, Comment, News };
