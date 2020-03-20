@@ -1,7 +1,0 @@
-// read
-
-// create
-
-// update
-
-// delete

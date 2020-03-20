@@ -23,8 +23,8 @@ const userSchema = new mongoose.Schema({
   friends: [
     {
       user: { type: oid, ref: "user" },
-      create_date: { type: Date, default: Date.now() },
-      status: { type: String, default: "N" }
+      status: { type: String, default: "N" },
+      create_date: { type: Date, default: Date.now() }
     }
   ],
   del_yn: { type: String, default: "N" },
@@ -37,8 +37,6 @@ const User = mongoose.model("user", userSchema);
 const postSchema = new mongoose.Schema({
   content: { type: String, require: true },
   author: { type: oid, require: true, ref: "user" },
-  categories: [{ type: String, default: "ALL" }], // Category 이름을 스스로 정해서 사용할 수 있도록 한다
-  tags: [String],
   likes: [
     {
       user: { type: oid, ref: "user" },
@@ -58,6 +56,7 @@ const postSchema = new mongoose.Schema({
       create_date: { type: Date, default: Date.now() }
     }
   ],
+  groups: [{ type: oid, ref: "group" }],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
   delete_date: Date,
@@ -83,12 +82,30 @@ const commentSchema = new mongoose.Schema({
 const Comment = mongoose.model("comment", commentSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
 const newsSchema = new mongoose.Schema({
+  from: { type: oid, ref: "user" },
   message: { type: String, require: true },
   is_new: { type: String, default: "Y" },
-  author: { type: oid, ref: "user" },
+  to: { type: oid, ref: "user" },
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
 const News = mongoose.model("news", newsSchema);
+// !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
+const groupSchema = new mongoose.Schema({
+  // 공개범위를 그룹도 넣기
+  name: { type: String, require: true, unique: true },
+  members: [
+    {
+      member: { type: oid, ref: "user" },
+      status: { type: String, default: "N" }
+    }
+  ],
+  manager: [{ type: oid, ref: "user" }],
+  description: String,
+  image: String,
+  create_date: { type: Date, default: Date.now() },
+  update_date: Date
+});
+const Group = mongoose.model("group", groupSchema);
 
-module.exports = { User, Post, Comment, News };
+module.exports = { User, Post, Comment, News, Group };
