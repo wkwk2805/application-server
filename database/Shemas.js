@@ -56,6 +56,7 @@ const postSchema = new mongoose.Schema({
       create_date: { type: Date, default: Date.now() }
     }
   ],
+  scope: { type: String, default: "ALL" }, // 모두, 친구만, 그룹만
   groups: [{ type: oid, ref: "group" }],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
@@ -85,7 +86,7 @@ const newsSchema = new mongoose.Schema({
   from: { type: oid, ref: "user" },
   message: { type: String, require: true },
   is_new: { type: String, default: "Y" },
-  to: { type: oid, ref: "user" },
+  to: [{ type: oid, ref: "user" }],
   create_date: { type: Date, default: Date.now() },
   update_date: Date
 });
@@ -97,10 +98,10 @@ const groupSchema = new mongoose.Schema({
   members: [
     {
       member: { type: oid, ref: "user" },
-      status: { type: String, default: "N" }
+      status: { type: String, default: "N" },
+      grade: { type: String, default: "MEMBER" } // MEMBER, MANAGER
     }
   ],
-  manager: [{ type: oid, ref: "user" }],
   description: String,
   image: String,
   create_date: { type: Date, default: Date.now() },

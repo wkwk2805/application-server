@@ -10,5 +10,8 @@ const hashPwd = password =>
     .createHmac("sha256", hashSecret)
     .update(password)
     .digest("hex");
+const fileHandler = files => {
+  return files;
+};
 
-module.exports = { resultData, hashSecret, SECRET_KEY, hashPwd };
+module.exports = { resultData, hashSecret, SECRET_KEY, hashPwd, fileHandler };
