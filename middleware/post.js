@@ -14,34 +14,20 @@ const register = async (req, res) => {
     // 파일 가공
     const files = fileHandler(req.body.files);
     // 데이터 추가
-    const addedPost = await new Post(
-      {
-        content: req.body.content,
-        author: req.user_id,
-        files: files,
-        scope: req.body.scope,
-        groups: req.body.groupIds
-      },
-      { session }
-    ).save();
+    const addedPost = await new Post({
+      content: req.body.content,
+      author: req.user_id,
+      files: files,
+      scope: req.body.scope,
+      groups: req.body.groupIds
+    }).save(session);
     // 소식지 추가
     if (req.body.scope === "GROUP") {
-      const user = await User.findOne({ _id: req.user_id }).populate({
-        path: "groups",
-        populate: { path: "member", match: { status: "Y" } }
-      });
-      /* const groups = user.map(e => e.groups);
-      const members = groups.map(e => e.members);
-      const _ids = members.map(e => e._id); */
-      //TODO 그룹만 보도록 호출하기 위해 그룹 구성원들에게만 알림을 보내기 위한 로직
-      await new News(
-        {
-          from: req.user_id,
-          message: `${user.id}님이 게시글을 올렸습니다.`,
-          to: user.friends.map(e => e.user)
-        },
-        { session }
-      ).save();
+      await new News({
+        from: req.user_id,
+        message: `${user.id}님이 게시글을 올렸습니다.`,
+        to: user.friends.map(e => e.user)
+      }).save(session);
     } else {
       const user = await User.findOne({ _id: req.user_id });
       await new News(
