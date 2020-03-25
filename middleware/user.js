@@ -32,7 +32,7 @@ const modify = async (req, res) => {
 };
 // 비밀번호 변경
 const modifyPassword = async (req, res) => {
-  console.log(TAG, "modify");
+  console.log(TAG, "modifyPassword");
   try {
     const updatedUser = await User.findOneAndUpdate(
       { id: req.body.id },

@@ -5,7 +5,7 @@ const TAG = "/middleware/auth.js/";
 
 // login
 const login = (req, res) => {
-  console.log(TAG, "/login", req.body);
+  console.log(TAG, "/login");
   User.find(
     { id: req.body.id, password: hashPwd(req.body.password) },
     (err, data) => {
@@ -51,7 +51,7 @@ const verify = async (req, res, next) => {
 
 // 회원가입 - 여기에 한 이유는 app.use(verify)를 사용하기 위해서
 const register = (req, res) => {
-  console.log(TAG, "register", req.body);
+  console.log(TAG, "register");
   User.find({ id: req.body.id }, function(err, data) {
     if (err) throw err;
     if (data.length === 0) {

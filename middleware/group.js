@@ -1,4 +1,5 @@
 const { Group } = require("../database/Shemas");
+const { resultData } = require("../utility/common");
 const TAG = "/middleware/group.js";
 
 // 그룹만들기
@@ -47,7 +48,7 @@ const signin = async (req, res) => {
   }
 };
 //그룹 승인하기
-const changeStatus = async (req, res) => {
+const member = async (req, res) => {
   let change = req.body.change; // {key:[status, grade], value:[[Y,N],[MEMBER,MANAGER]]}
   const memberUser = await Group.findOne({
     _id: req.body.group_id
@@ -70,25 +71,38 @@ const changeStatus = async (req, res) => {
 //그룹 정보 수정하기
 const modify = async (req, res) => {
   console.log(TAG, "modify");
-  const data = {};
-  req.body.name && (data["name"] = req.body.name);
-  req.body.description && (data["description"] = req.body.description);
-  req.body.image && (data["image"] = req.body.image);
-  const updatedGroup = await Group.findOneAndUpdate(
-    { _id: req.body.group_id },
-    data,
-    { new: true }
-  );
-  res.json(resultData(true, "그룹정보수정성공", updatedGroup));
+  const isGroupName = await Group.findOne({
+    name: req.body.name,
+    author: req.user_id
+  });
+  if (!isGroupName) {
+    const data = {};
+    req.body.name && (data["name"] = req.body.name);
+    req.body.description && (data["description"] = req.body.description);
+    req.body.image && (data["image"] = req.body.image);
+    const updatedGroup = await Group.findOneAndUpdate(
+      { _id: req.body.group_id },
+      data,
+      { new: true }
+    );
+    res.json(resultData(true, "그룹정보수정성공", updatedGroup));
+  } else {
+    res.json(resultData(true, "가지고있는 그룹명입니다.", updatedGroup));
+  }
 };
 //그룹 탈퇴하기(시키기)
 const getOut = async (req, res) => {
+  console.log(TAG, "getOut");
   const outUser = await Group.findOneAndUpdate(
     { _id: req.body.group_id },
-    { $pull: { members: { member: req.body.out_id } } },
+    {
+      $pull: {
+        members: { member: req.body.out_id ? req.body.out_id : req.user_id }
+      }
+    },
     { new: true }
   );
   res.json(resultData(true, "그룹 탈퇴 성공", outUser));
 };
 
-module.exports = { register, signin, changeStatus, getOut, modify };
+module.exports = { register, signin, member, getOut, modify };

@@ -5,7 +5,7 @@ const TAG = "/middleware/post.js/";
 
 // create
 const register = async (req, res) => {
-  console.log(TAG, "register", req.body);
+  console.log(TAG, "register");
   // 파일 가공
   const files = fileHandler(req.body.files);
   // 데이터 추가

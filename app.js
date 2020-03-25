@@ -6,6 +6,7 @@ const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const postRouter = require("./routes/post");
 const commentRouter = require("./routes/comment");
+const groupRouter = require("./routes/group");
 const { verify } = require("./middleware/auth");
 
 // DB연결
@@ -22,6 +23,7 @@ app.use(verify);
 app.use("/user", userRouter);
 app.use("/post", postRouter);
 app.use("/comment", commentRouter);
+app.use("/group", groupRouter);
 
 app.listen(80, () => {
   console.log("Connect! Application Server");
