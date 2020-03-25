@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Post, User, News } = require("../database/Shemas");
+const { Post } = require("../database/Shemas");
 const { resultData, fileHandler } = require("../utility/common");
 const TAG = "/middleware/post.js/";
 // read
@@ -7,74 +6,35 @@ const TAG = "/middleware/post.js/";
 // create
 const register = async (req, res) => {
   console.log(TAG, "register", req.body);
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction({ readConcern: { level: "snapshot" } });
-    await Post.createCollection();
-    // 파일 가공
-    const files = fileHandler(req.body.files);
-    // 데이터 추가
-    const addedPost = await new Post({
-      content: req.body.content,
-      author: req.user_id,
-      files: files,
-      scope: req.body.scope,
-      groups: req.body.groupIds
-    }).save(session);
-    // 소식지 추가
-    if (req.body.scope === "GROUP") {
-      await new News({
-        from: req.user_id,
-        message: `${user.id}님이 게시글을 올렸습니다.`,
-        to: user.friends.map(e => e.user)
-      }).save(session);
-    } else {
-      const user = await User.findOne({ _id: req.user_id });
-      await new News(
-        {
-          from: req.user_id,
-          message: `${user.id}님이 게시글을 올렸습니다.`,
-          to: user.friends.map(e => e.user)
-        },
-        { session }
-      ).save();
-    }
-    await session.commitTransaction();
-    res.json(addedPost);
-  } catch (error) {
-    console.error(error);
-    await session.abortTransaction();
-  } finally {
-    session.endSession();
-  }
+  // 파일 가공
+  const files = fileHandler(req.body.files);
+  // 데이터 추가
+  const data = {
+    content: req.body.content,
+    author: req.user_id,
+    files: files,
+    scope: req.body.scope
+  };
+  req.body.scope === "GROUP" && (data.groups = req.body.groupIds);
+  const addedPost = await new Post(data).save();
+  res.json(addedPost);
 };
 
 // update
 const modify = async (req, res) => {
   console.log(TAG, "modify");
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction({ readConcern: { level: "snapshot" } });
-    // 새로운 파일로 override
-    const files = fileHandler(req.body.files);
-    // 새로운 파일이 들어간 데이터로 변환
-    const post = await Post.findOneAndUpdate(
-      { _id: req.body.post_id },
-      {
-        content: req.body.content,
-        files: files
-      },
-      { session, new: true }
-    );
-    await session.commitTransaction();
-    res.json(post);
-  } catch (error) {
-    console.error(error);
-    await session.abortTransaction();
-    res.json(resultData(false, "ERROR", error));
-  } finally {
-    session.endSession();
-  }
+  // 새로운 파일로 override
+  const files = fileHandler(req.body.files);
+  // 새로운 파일이 들어간 데이터로 변환
+  const post = await Post.findOneAndUpdate(
+    { _id: req.body.post_id },
+    {
+      content: req.body.content,
+      files: files
+    },
+    { new: true }
+  );
+  res.json(post);
 };
 
 // delete
@@ -87,4 +47,48 @@ const remove = async (req, res) => {
   res.json(removedPost);
 };
 
-module.exports = { register, modify, remove };
+// like post
+const like = async (req, res) => {
+  console.log(TAG, "likePost");
+  // 기존에 좋아요 유무 확인
+  const isLike = await Post.findOne({
+    _id: req.body.post_id,
+    "likes.user": req.user_id
+  });
+  // 기존에 좋아요가 있다면 취소
+  let likeCnt = 0;
+  if (isLike) {
+    likeCnt = (
+      await Post.findOneAndUpdate(
+        { _id: req.body.post_id, "likes.user": req.user_id },
+        { $pull: { likes: { user: req.user_id } } },
+        { new: true }
+      )
+    ).likes.length;
+  } else {
+    // 기존에 좋아요가 없다면 좋아요
+    likeCnt = (
+      await Post.findOneAndUpdate(
+        { _id: req.body.post_id },
+        { $push: { likes: { user: req.user_id } } },
+        { new: true }
+      )
+    ).likes.length;
+  }
+  res.json(resultData(true, "좋아요성공", likeCnt));
+};
+
+// share post
+// 공유 완료시에 동작
+const share = async (req, res) => {
+  console.log(TAG, "likePost");
+  let shareCnt = (
+    await Post.findOneAndUpdate(
+      { _id: req.body.post_id },
+      { $push: { shares: { user: req.user_id } } },
+      { new: true }
+    )
+  ).shares.length;
+  res.json(resultData(true, "공유성공", shareCnt));
+};
+module.exports = { register, modify, remove, like, share };

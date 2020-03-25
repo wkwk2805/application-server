@@ -11,6 +11,7 @@ const hashPwd = password =>
     .update(password)
     .digest("hex");
 const fileHandler = files => {
+  // 수정파일이라면 기존파일 제거
   return files;
 };
 

@@ -1,5 +1,11 @@
 const router = require("express").Router();
-const { modify, remove, follow, permission } = require("../middleware/user");
+const {
+  modify,
+  remove,
+  follow,
+  permission,
+  block
+} = require("../middleware/user");
 const { getPostsByAllUser } = require("../read/userSelect");
 // read
 router.post("/", getPostsByAllUser);
@@ -11,5 +17,7 @@ router.delete("/", remove);
 router.put("/follow", follow);
 // permission
 router.put("/permission", permission);
+// block
+router.put("/block", block);
 // export
 module.exports = router;

@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { create, modify, remove } = require("../middleware/comment");
+const { create, modify, remove, like } = require("../middleware/comment");
 // read
 // create
 router.put("/", create);
@@ -7,5 +7,7 @@ router.put("/", create);
 router.patch("/", modify);
 // delete
 router.delete("/", remove);
+// like
+router.put("/like", like);
 //export
 module.exports = router;

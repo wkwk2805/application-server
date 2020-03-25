@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
   friends: [
     {
       user: { type: oid, ref: "user" },
-      status: { type: String, default: "N" },
+      status: { type: String, default: "N" }, // Y:승인, N:모름, B:차단
       create_date: { type: Date, default: Date.now() }
     }
   ],
@@ -57,6 +57,7 @@ const postSchema = new mongoose.Schema({
     }
   ],
   scope: { type: String, default: "ALL" }, // 모두, 친구만, 그룹만
+  groups: [{ type: oid, ref: "group" }],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
   delete_date: Date,
@@ -94,6 +95,7 @@ const News = mongoose.model("news", newsSchema);
 const groupSchema = new mongoose.Schema({
   // 공개범위를 그룹도 넣기
   name: { type: String, require: true, unique: true },
+  author: { type: oid, ref: "user" },
   members: [
     {
       member: { type: oid, ref: "user" },

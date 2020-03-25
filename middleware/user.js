@@ -88,14 +88,6 @@ const follow = async (req, res) => {
       { $push: { friends: { user: req.body.friend_id } } },
       { new: true }
     );
-    const u = await User.findOne({ _id: req.user_id });
-    const f = await User.findOne({ _id: req.body.friend_id });
-    // 소식을 신청한 사람에게 보내기
-    await new News({
-      from: req.user_id,
-      message: `${u.id}님이 ${f.id}님에게 친구신청을 하였습니다.`,
-      to: req.body.friend_id
-    }).save();
     res.json(updatedUser);
   } else {
     res.json("이미 추가한 친구입니다.");
@@ -104,47 +96,53 @@ const follow = async (req, res) => {
 // 친구허가
 const permission = async (req, res) => {
   console.log(TAG, "permission");
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    // 허가시 친구를 스키마에 추가
-    await User.createCollection();
-    await User.findOneAndUpdate(
-      { _id: req.user_id },
-      { $push: { friends: { user: req.body.friend_id, status: "Y" } } },
-      { new: true }
-    );
-    // 허가시 기존에 있던 부분에서 status를 Y로 변경
-    const friendUser = await User.findOne({
-      _id: req.body.friend_id
-    });
-    const frs = friendUser.friends;
-    for (i in frs) {
-      if (frs[i].user == req.user_id) {
-        console.log("HELOW");
-        frs[i].status = "Y";
-      }
+  await User.findOneAndUpdate(
+    { _id: req.user_id },
+    { $push: { friends: { user: req.body.friend_id, status: "Y" } } },
+    { new: true }
+  );
+  // 허가시 기존에 있던 부분에서 status를 Y로 변경
+  const friendUser = await User.findOne({
+    _id: req.body.friend_id
+  });
+  const frs = friendUser.friends;
+  for (i in frs) {
+    if (frs[i].user == req.user_id) {
+      frs[i].status = "Y";
     }
-    await User.findOneAndUpdate(
-      { _id: req.body.friend_id },
-      { $set: { friends: frs } },
-      { new: true }
-    );
-    await News.createCollection();
-    await new News({
-      from: req.user_id,
-      message: `${u.id}님이 ${f.id}님의 친구신청을 허락하였습니다.`,
-      to: req.body.friend_id
-    }).save();
-    session.commitTransaction();
-    res.json(resultData(true, "친구 수락 성공!"));
-  } catch (e) {
-    console.log(e);
-    session.abortTransaction();
-  } finally {
-    session.endSession();
   }
+  const permUser = await User.findOneAndUpdate(
+    { _id: req.body.friend_id },
+    { $set: { friends: frs } },
+    { new: true }
+  );
+  res.json(resultData(true, "친구 수락 성공!", permUser));
+};
+
+const block = async (req, res) => {
+  console.log(TAG, "permission");
+  await User.findOneAndUpdate(
+    { _id: req.user_id },
+    { $push: { friends: { user: req.body.friend_id, status: "Y" } } },
+    { new: true }
+  );
+  // 허가시 기존에 있던 부분에서 status를 Y로 변경
+  const friendUser = await User.findOne({
+    _id: req.body.friend_id
+  });
+  const frs = friendUser.friends;
+  for (i in frs) {
+    if (frs[i].user == req.user_id) {
+      frs[i].status = "B";
+    }
+  }
+  const permUser = await User.findOneAndUpdate(
+    { _id: req.body.friend_id },
+    { $set: { friends: frs } },
+    { new: true }
+  );
+  res.json(resultData(true, "친구 수락 성공!", permUser));
 };
 
 // export
-module.exports = { modify, remove, modifyPassword, follow, permission };
+module.exports = { modify, remove, modifyPassword, follow, permission, block };
