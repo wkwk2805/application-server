@@ -56,7 +56,7 @@ const postSchema = new mongoose.Schema({
       create_date: { type: Date, default: Date.now() }
     }
   ],
-  scope: { type: String, default: "ALL" }, // 모두, 친구만, 그룹만
+  scope: { type: String, default: "ALL" }, // 모두(ALL), 친구만(FRIEND), 그룹만(GROUP), 나만(ME), 친구+그룹(PLUS)
   groups: [{ type: oid, ref: "group" }],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
@@ -77,6 +77,7 @@ const commentSchema = new mongoose.Schema({
   ],
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
+  recomments: [{ type: oid, ref: "comment" }],
   delete_date: Date,
   update_date: Date
 });
