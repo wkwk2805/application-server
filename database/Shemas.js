@@ -56,6 +56,7 @@ const postSchema = new mongoose.Schema({
       create_date: { type: Date, default: Date.now() }
     }
   ],
+  tags: [{ type: oid, ref: "tag" }],
   scope: { type: String, default: "ALL" }, // 모두(ALL), 친구만(FRIEND), 그룹만(GROUP), 나만(ME), 친구+그룹(PLUS)
   groups: [{ type: oid, ref: "group" }],
   create_date: { type: Date, default: Date.now() },
@@ -68,7 +69,7 @@ const Post = mongoose.model("post", postSchema);
 const commentSchema = new mongoose.Schema({
   content: { type: String, require: true },
   author: { type: oid, require: true, ref: "user" },
-  post_ids: { type: oid, require: true, ref: "post" },
+  post: { type: oid, require: true, ref: "post" },
   likes: [
     {
       user: { type: oid, ref: "user" },
@@ -89,6 +90,7 @@ const newsSchema = new mongoose.Schema({
   is_new: { type: String, default: "Y" },
   to: [{ type: oid, ref: "user" }],
   create_date: { type: Date, default: Date.now() },
+  type: { type: String }, // POST, COMMENT, GROUP, FRIEND, LIKE, TAG
   update_date: Date
 });
 const News = mongoose.model("news", newsSchema);
@@ -111,4 +113,12 @@ const groupSchema = new mongoose.Schema({
 });
 const Group = mongoose.model("group", groupSchema);
 
-module.exports = { User, Post, Comment, News, Group };
+const tagSchema = new mongoose.Schema({
+  content: { type: String, require: true, unique: true },
+  create_date: { type: Date, default: Date.now() },
+  posts: [{ type: oid, ref: "post" }],
+  comments: [{ type: oid, ref: "comment" }]
+});
+const Tag = mongoose.model("tag", tagSchema);
+
+module.exports = { User, Post, Comment, News, Group, Tag };
