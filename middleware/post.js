@@ -1,6 +1,10 @@
-const mongoose = require("mongoose");
 const { Post } = require("../database/Shemas");
-const { resultData, fileHandler, tagHandler } = require("../utility/common");
+const {
+  resultData,
+  fileHandler,
+  tagHandler,
+  friendsHandler
+} = require("../utility/common");
 const TAG = "/middleware/post.js/";
 // read
 
@@ -10,15 +14,17 @@ const register = async (req, res) => {
   // 파일 가공
   const files = fileHandler(req.body.files);
   const tags = tagHandler(req.body.content);
+  const friends = friendsHandler(req.body.content);
   // 데이터 추가
   const data = {
     content: req.body.content,
     author: req.user_id,
     files: files,
     scope: req.body.scope,
-    tags: tags
+    tags: tags,
+    friends: friends
   };
-  req.body.scope === "GROUP" && (data.groups = req.body.groupIds);
+  req.body.scope === "GROUP" && (data.groups = req.body.groups);
   const addedPost = await new Post(data).save();
   res.json(addedPost);
 };

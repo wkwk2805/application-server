@@ -1,4 +1,4 @@
-const { Group } = require("../database/Shemas");
+const { Group, Post } = require("../database/Shemas");
 const { resultData } = require("../utility/common");
 const TAG = "/middleware/group.js";
 
@@ -64,7 +64,7 @@ const member = async (req, res) => {
     { $set: { members: mems } },
     { new: true }
   );
-  res.json(resultData(true, "", updateGroup));
+  res.json(resultData(true, "그룹승인함", updateGroup));
 };
 //그룹 초대하기 - URL날려야하나?
 
@@ -104,5 +104,20 @@ const getOut = async (req, res) => {
   );
   res.json(resultData(true, "그룹 탈퇴 성공", outUser));
 };
+// 그룹 지우기
+const removeGroup = async (req, res) => {
+  const group = await Group.findOneAndDelete({ _id: req.body.group_id });
+  console.log(group);
+  const updatedPost = await Post.findOneAndUpdate(
+    {
+      groups: group._id
+    },
+    {
+      $pull: { groups: group._id }
+    },
+    { new: true }
+  );
+  res.json(resultData(true, "그룹지우기성공", updatedPost));
+};
 
-module.exports = { register, signin, member, getOut, modify };
+module.exports = { register, signin, member, getOut, modify, removeGroup };

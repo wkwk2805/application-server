@@ -17,20 +17,19 @@ const fileHandler = files => {
 };
 // tag를 배열화 하여 값 넣기
 const tagHandler = contents => {
-  console.log(contents);
+  let resultList = [];
   const hashTagList = [];
   const list = contents.split(" ");
   if (list.length === 0) {
-    return false;
+    return [];
   }
   for (let item of list) {
     if (item.indexOf("#") > -1) {
       hashTagList.push(item);
     }
   }
-  let resultList = [];
   if (hashTagList.length === 0) {
-    return false;
+    return [];
   }
   for (let item of hashTagList) {
     const array = item.split("#");
@@ -38,9 +37,35 @@ const tagHandler = contents => {
     resultList = resultList.concat(array);
   }
   if (resultList.length === 0) {
-    return false;
+    return [];
   }
   return resultList.map(e => "#" + e);
+};
+
+const friendsHandler = contents => {
+  const hashTagList = [];
+  const list = contents.split(" ");
+  let resultList = [];
+  if (list.length === 0) {
+    return [];
+  }
+  for (let item of list) {
+    if (item.indexOf("@") > -1) {
+      hashTagList.push(item);
+    }
+  }
+  if (hashTagList.length === 0) {
+    return [];
+  }
+  for (let item of hashTagList) {
+    const array = item.split("@");
+    array.shift();
+    resultList = resultList.concat(array);
+  }
+  if (resultList.length === 0) {
+    return [];
+  }
+  return resultList;
 };
 
 module.exports = {
@@ -49,5 +74,6 @@ module.exports = {
   SECRET_KEY,
   hashPwd,
   fileHandler,
-  tagHandler
+  tagHandler,
+  friendsHandler
 };

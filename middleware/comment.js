@@ -1,14 +1,16 @@
 const { Comment } = require("../database/Shemas");
-const { resultData } = require("../utility/common");
+const { resultData, tagHandler } = require("../utility/common");
 // read
 const TAG = "/middleware/comment.js/";
 // create
 const create = async (req, res) => {
   console.log(TAG, "create");
+  const tags = tagHandler(req.body.content);
   const savedComment = await new Comment({
     content: req.body.content,
     post: req.body.post_id,
-    author: req.user_id
+    author: req.user_id,
+    tags: tags
   }).save();
   res.json(resultData(true, "댓글등록성공", savedComment));
 };
@@ -68,9 +70,11 @@ const like = async (req, res) => {
 // 답글달기
 const reCreate = async (req, res) => {
   console.log(TAG, "reCreate");
+  const tags = tagHandler(req.body.content);
   const savedComment = await new Comment({
     content: req.body.content,
-    author: req.user_id
+    author: req.user_id,
+    tags: tags
   }).save();
 
   const reComment = await Comment.findOneAndUpdate(
