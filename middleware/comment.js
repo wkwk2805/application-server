@@ -12,7 +12,7 @@ const create = async (req, res) => {
   }).save();
   res.json(resultData(true, "댓글등록성공", savedComment));
 };
-// update
+// update 댓글 답글 다 사용가능
 const modify = async (req, res) => {
   console.log(TAG, "modify");
   const updatedComment = await Comment.findOneAndUpdate(
@@ -34,7 +34,7 @@ const remove = async (req, res) => {
   );
   res.json(comment);
 };
-// like comment
+// like comment, 댓글 답글 다 사용가능
 const like = async (req, res) => {
   console.log(TAG, "likeComment");
   // 기존에 좋아요 유무 확인
@@ -65,4 +65,37 @@ const like = async (req, res) => {
   res.json(resultData(true, "좋아요성공", likeCnt));
 };
 
-module.exports = { create, modify, remove, like };
+// 답글달기
+const reCreate = async (req, res) => {
+  console.log(TAG, "reCreate");
+  const savedComment = await new Comment({
+    content: req.body.content,
+    author: req.user_id
+  }).save();
+
+  const reComment = await Comment.findOneAndUpdate(
+    {
+      _id: req.body.comment_id
+    },
+    { $push: { recomments: savedComment._id } },
+    { new: true }
+  );
+  res.json(resultData(true, "답글등록성공", reComment));
+};
+
+// 답글지우기
+const reRemove = async (req, res) => {
+  console.log(TAG, "reRemove");
+  const recomment_id = req.body.recomment_id;
+  // 배열에서 삭제
+  await Comment.findOneAndUpdate(
+    { recomments: recomment_id },
+    { $pull: { recomments: recomment_id } },
+    { new: true }
+  );
+  // 코멘트 자체에서 삭제
+  const removedComment = await Comment.findOneAndDelete({ _id: recomment_id });
+  res.json(resultData(true, "답글제거성공", removedComment));
+};
+
+module.exports = { create, modify, remove, like, reCreate, reRemove };
