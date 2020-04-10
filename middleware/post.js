@@ -3,30 +3,35 @@ const {
   resultData,
   fileHandler,
   tagHandler,
-  friendsHandler
+  friendsHandler,
 } = require("../utility/common");
 const TAG = "/middleware/post.js/";
 // read
 
 // create
 const register = async (req, res) => {
-  console.log(TAG, "register");
-  // 파일 가공
-  const files = fileHandler(req.body.files);
-  const tags = tagHandler(req.body.content);
-  const friends = friendsHandler(req.body.content);
-  // 데이터 추가
-  const data = {
-    content: req.body.content,
-    author: req.user_id,
-    files: files,
-    scope: req.body.scope,
-    tags: tags,
-    friends: friends
-  };
-  req.body.scope === "GROUP" && (data.groups = req.body.groups);
-  const addedPost = await new Post(data).save();
-  res.json(addedPost);
+  try {
+    console.log(TAG, "register");
+    // 파일 가공
+    const files = fileHandler(req.body.files);
+    const tags = tagHandler(req.body.content);
+    const friends = friendsHandler(req.body.content);
+    // 데이터 추가
+    const data = {
+      content: req.body.content,
+      author: req.user_id,
+      files: files,
+      scope: req.body.scope,
+      tags: tags,
+      friends: friends,
+    };
+    req.body.scope === ("GROUP" || "PLUS") && (data.groups = req.body.groups);
+    const addedPost = await new Post(data).save();
+    res.json(resultData(true, "글 등록 성공", addedPost));
+  } catch (error) {
+    console.log(error);
+    res.json(resultData(false, "글 등록 실패"));
+  }
 };
 
 // update
@@ -39,7 +44,7 @@ const modify = async (req, res) => {
     { _id: req.body.post_id },
     {
       content: req.body.content,
-      files: files
+      files: files,
     },
     { new: true }
   );
@@ -51,7 +56,7 @@ const remove = async (req, res) => {
   console.log(TAG, "remove");
   const removedPost = await Post.findByIdAndUpdate(req.body.post_id, {
     del_yn: "Y",
-    delete_date: Date.now()
+    delete_date: Date.now(),
   });
   res.json(removedPost);
 };
@@ -62,7 +67,7 @@ const like = async (req, res) => {
   // 기존에 좋아요 유무 확인
   const isLike = await Post.findOne({
     _id: req.body.post_id,
-    "likes.user": req.user_id
+    "likes.user": req.user_id,
   });
   // 기존에 좋아요가 있다면 취소
   let likeCnt = 0;
