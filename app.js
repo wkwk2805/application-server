@@ -8,10 +8,12 @@ const postRouter = require("./routes/post");
 const commentRouter = require("./routes/comment");
 const groupRouter = require("./routes/group");
 const { verify } = require("./middleware/auth");
+const cors = require("cors");
 
 // DB연결
 DBConnection();
-
+// cors설정
+app.use(cors());
 // body parser 설정
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
