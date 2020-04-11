@@ -17,7 +17,7 @@ const login = (req, res) => {
         });
         res.json(resultData(true, "로그인 성공", token));
       } else {
-        res.json(resultData(false, "로그인 실패"));
+        res.json(resultData(false, "아이디 또는 비밀번호가 맞지 않습니다"));
       }
     }
   );
