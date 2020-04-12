@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     require: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
   },
   password: { type: String, require: true, trim: true },
   name: String,
@@ -17,20 +17,22 @@ const userSchema = new mongoose.Schema({
     {
       name: { type: String },
       path: { type: String },
-      create_date: { type: Date, default: Date.now() }
-    }
+      mimetype: { type: String },
+      size: { type: Number },
+      create_date: { type: Date, default: Date.now() },
+    },
   ],
   friends: [
     {
       user: { type: oid, ref: "user" },
       status: { type: String, default: "N" }, // Y:승인, N:모름, B:차단
-      create_date: { type: Date, default: Date.now() }
-    }
+      create_date: { type: Date, default: Date.now() },
+    },
   ],
   del_yn: { type: String, default: "N" },
   create_date: { type: Date, default: Date.now() },
   update_date: Date,
-  delete_date: Date
+  delete_date: Date,
 });
 const User = mongoose.model("user", userSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
@@ -40,21 +42,24 @@ const postSchema = new mongoose.Schema({
   likes: [
     {
       user: { type: oid, ref: "user" },
-      create_date: { type: Date, default: Date.now() }
-    }
+      create_date: { type: Date, default: Date.now() },
+    },
   ],
   files: [
     {
       name: { type: String },
       path: { type: String },
-      create_date: { type: Date, default: Date.now() }
-    }
+      mimetype: { type: String },
+      size: { type: Number },
+      number: { type: Number },
+      create_date: { type: Date, default: Date.now() },
+    },
   ],
   shares: [
     {
       user: { type: oid, ref: "user" },
-      create_date: { type: Date, default: Date.now() }
-    }
+      create_date: { type: Date, default: Date.now() },
+    },
   ],
   tags: [String],
   friends: [String],
@@ -63,7 +68,7 @@ const postSchema = new mongoose.Schema({
   create_date: { type: Date, default: Date.now() },
   del_yn: { type: String, default: "N" },
   delete_date: Date,
-  update_date: Date
+  update_date: Date,
 });
 const Post = mongoose.model("post", postSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
@@ -74,8 +79,8 @@ const commentSchema = new mongoose.Schema({
   likes: [
     {
       user: { type: oid, ref: "user" },
-      create_date: { type: Date, default: Date.now() }
-    }
+      create_date: { type: Date, default: Date.now() },
+    },
   ],
   tags: [String],
   friends: [String],
@@ -83,7 +88,7 @@ const commentSchema = new mongoose.Schema({
   del_yn: { type: String, default: "N" },
   recomments: [{ type: oid, ref: "comment" }],
   delete_date: Date,
-  update_date: Date
+  update_date: Date,
 });
 const Comment = mongoose.model("comment", commentSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
@@ -94,7 +99,7 @@ const newsSchema = new mongoose.Schema({
   to: [{ type: oid, ref: "user" }],
   create_date: { type: Date, default: Date.now() },
   type: { type: String }, // POST, COMMENT, GROUP, FRIEND, LIKE, TAG
-  update_date: Date
+  update_date: Date,
 });
 const News = mongoose.model("news", newsSchema);
 // !!!!!!스키마 변경시 update 부분도 꼭 변경해주기!!!!!!
@@ -106,13 +111,13 @@ const groupSchema = new mongoose.Schema({
     {
       member: { type: oid, ref: "user" },
       status: { type: String, default: "N" },
-      grade: { type: String, default: "MEMBER" } // MEMBER, MANAGER
-    }
+      grade: { type: String, default: "MEMBER" }, // MEMBER, MANAGER
+    },
   ],
   description: String,
   image: String,
   create_date: { type: Date, default: Date.now() },
-  update_date: Date
+  update_date: Date,
 });
 const Group = mongoose.model("group", groupSchema);
 

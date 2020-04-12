@@ -18,7 +18,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // 정적파일제공
-app.use("/assets", express.static(__dirname + "/uploads"));
+app.use("/uploads", express.static(__dirname + "/uploads"));
 // 라우터
 app.use("/auth", authRouter);
 // 로그인 후에 사용될 verify

@@ -11,9 +11,12 @@ const hashPwd = (password) =>
     .update(password)
     .digest("hex");
 const fileHandler = (files = []) => {
-  const fileList = files.map((e) => ({
+  const fileList = files.map((e, i) => ({
+    number: i,
     name: e.filename,
-    path: "/uploads/" + e.filename,
+    path: e.path,
+    size: e.size,
+    mimetype: e.mimetype,
   }));
   // 수정파일이라면 기존파일 제거
   return fileList;
