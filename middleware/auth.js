@@ -10,7 +10,7 @@ const login = (req, res) => {
     { id: req.body.id, password: hashPwd(req.body.password) },
     (err, data) => {
       if (err) throw err;
-      if (data.length === 1) {
+      if (data) {
         data.password = undefined;
         const token = jwt.sign({ data: data }, SECRET_KEY, {
           expiresIn: "1d",
