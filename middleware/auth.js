@@ -6,7 +6,7 @@ const TAG = "/middleware/auth.js/";
 // login
 const login = (req, res) => {
   console.log(TAG, "/login");
-  User.find(
+  User.findOne(
     { id: req.body.id, password: hashPwd(req.body.password) },
     (err, data) => {
       if (err) throw err;
@@ -28,10 +28,10 @@ const verify = async (req, res, next) => {
     console.log(TAG, "verify");
     const decode = jwt.verify(req.headers.token, SECRET_KEY);
     // const password = decode.data[0].password;
-    const id = decode.data[0].id;
+    const id = decode.data.id;
     const data = await User.find({ id: id /*, password: password */ });
     if (data.length === 1) {
-      req.user_id = decode.data[0]._id;
+      req.user_id = decode.data._id;
       if (req.body.init) {
         res.json(resultData(true));
       } else {
