@@ -28,6 +28,6 @@ app.use("/post", postRouter);
 app.use("/comment", commentRouter);
 app.use("/group", groupRouter);
 
-app.listen(80, () => {
+app.listen(3001, () => {
   console.log("Connect! Application Server");
 });
