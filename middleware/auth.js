@@ -6,21 +6,22 @@ const TAG = "/middleware/auth.js/";
 // login
 const login = (req, res) => {
   console.log(TAG, "/login");
-  User.findOne(
-    { id: req.body.id, password: hashPwd(req.body.password) },
-    (err, data) => {
-      if (err) throw err;
-      if (data) {
+  User.findOne({ id: req.body.id }, (err, data) => {
+    if (err) throw err;
+    if (data) {
+      if (data.password === hashPwd(req.body.password)) {
         data.password = undefined;
         const token = jwt.sign({ data: data }, SECRET_KEY, {
           expiresIn: "1d",
         });
         res.json(resultData(true, "로그인 성공", token));
       } else {
-        res.json(resultData(false, "아이디 또는 비밀번호가 맞지 않습니다"));
+        res.json(resultData(false, "비밀번호가 일치하지 않습니다."));
       }
+    } else {
+      res.json(resultData(false, "아이디가 존재하지 않습니다."));
     }
-  );
+  });
 };
 // verify
 const verify = async (req, res, next) => {
@@ -33,7 +34,7 @@ const verify = async (req, res, next) => {
     if (data.length === 1) {
       req.user_id = decode.data._id;
       if (req.body.init) {
-        res.json(resultData(true));
+        res.json(resultData(true, undefined, data));
       } else {
         next();
       }

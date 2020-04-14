@@ -4,9 +4,13 @@ const getAllPosts = async (req, res) => {
   const resultList = [];
   // 자신이 쓴글
   const myPostList = [];
-  const myPosts = await Post.find({ author: req.user_id }).populate("author");
+  const myPosts = await Post.find({ author: req.user_id })
+    .populate("author")
+    .populate("likes.user");
   for (let myPost of myPosts) {
-    const comments = await Comment.find({ post: myPost._id });
+    const comments = await Comment.find({ post: myPost._id }).populate(
+      "author"
+    );
     const myPostJson = myPost.toJSON();
     myPostJson["comments"] = comments;
     myPostJson["mine"] = true;

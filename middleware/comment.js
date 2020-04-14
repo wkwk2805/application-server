@@ -10,7 +10,7 @@ const create = async (req, res) => {
     content: req.body.content,
     post: req.body.post_id,
     author: req.user_id,
-    tags: tags
+    tags: tags,
   }).save();
   res.json(resultData(true, "댓글등록성공", savedComment));
 };
@@ -21,7 +21,7 @@ const modify = async (req, res) => {
     { _id: req.body.comment_id },
     {
       content: req.body.content,
-      update_date: Date.now()
+      update_date: Date.now(),
     },
     { new: true }
   );
@@ -42,29 +42,29 @@ const like = async (req, res) => {
   // 기존에 좋아요 유무 확인
   const isLike = await Comment.findOne({
     _id: req.body.comment_id,
-    "likes.user": req.user_id
+    "likes.user": req.user_id,
   });
   // 기존에 좋아요가 있다면 취소
-  let likeCnt = 0;
+  let likes = [];
   if (isLike) {
-    likeCnt = (
+    likes = (
       await Comment.findOneAndUpdate(
         { _id: req.body.comment_id, "likes.user": req.user_id },
         { $pull: { likes: { user: req.user_id } } },
         { new: true }
-      )
-    ).likes.length;
+      ).populate("likes.user")
+    ).likes;
   } else {
     // 기존에 좋아요가 없다면 좋아요
-    likeCnt = (
+    likes = (
       await Comment.findOneAndUpdate(
         { _id: req.body.comment_id },
         { $push: { likes: { user: req.user_id } } },
         { new: true }
-      )
-    ).likes.length;
+      ).populate("likes.user")
+    ).likes;
   }
-  res.json(resultData(true, "좋아요성공", likeCnt));
+  res.json(resultData(true, "좋아요성공", likes));
 };
 
 // 답글달기
@@ -74,12 +74,12 @@ const reCreate = async (req, res) => {
   const savedComment = await new Comment({
     content: req.body.content,
     author: req.user_id,
-    tags: tags
+    tags: tags,
   }).save();
 
   const reComment = await Comment.findOneAndUpdate(
     {
-      _id: req.body.comment_id
+      _id: req.body.comment_id,
     },
     { $push: { recomments: savedComment._id } },
     { new: true }

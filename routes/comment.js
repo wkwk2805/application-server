@@ -5,9 +5,12 @@ const {
   remove,
   like,
   reCreate,
-  reRemove
+  reRemove,
 } = require("../middleware/comment");
+const { getCommentsOfPost } = require("../read/commentSelect");
+
 // read
+router.post("/", getCommentsOfPost);
 // create
 router.put("/", create);
 // update

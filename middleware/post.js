@@ -70,26 +70,26 @@ const like = async (req, res) => {
     "likes.user": req.user_id,
   });
   // 기존에 좋아요가 있다면 취소
-  let likeCnt = 0;
+  let likes = [];
   if (isLike) {
-    likeCnt = (
+    likes = (
       await Post.findOneAndUpdate(
         { _id: req.body.post_id, "likes.user": req.user_id },
         { $pull: { likes: { user: req.user_id } } },
         { new: true }
-      )
-    ).likes.length;
+      ).populate("likes.user")
+    ).likes;
   } else {
     // 기존에 좋아요가 없다면 좋아요
-    likeCnt = (
+    likes = (
       await Post.findOneAndUpdate(
         { _id: req.body.post_id },
         { $push: { likes: { user: req.user_id } } },
         { new: true }
-      )
-    ).likes.length;
+      ).populate("likes.user")
+    ).likes;
   }
-  res.json(resultData(true, "좋아요성공", likeCnt));
+  res.json(resultData(true, "좋아요성공", likes));
 };
 
 // share post

@@ -6,7 +6,9 @@ const { getAllPosts } = require("../read/postSelect");
 // multer setting
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const dir = `uploads/${req.user_id}`;
+    let dir = `uploads/`;
+    !fs.existsSync(dir) && fs.mkdirSync(dir);
+    dir = `uploads/${req.user_id}`;
     !fs.existsSync(dir) && fs.mkdirSync(dir);
     cb(null, dir + "/"); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
   },
