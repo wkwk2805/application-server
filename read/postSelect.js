@@ -1,6 +1,8 @@
 const { Post, Comment, User } = require("../database/Shemas");
 
-const getAllPosts = async (req, res) => {
+const TAG = "read/postSelect.js";
+
+const getAllPostsForUser = async (req, res) => {
   const resultList = [];
   // 자신이 쓴글
   const myPostList = [];
@@ -24,4 +26,22 @@ const getAllPosts = async (req, res) => {
   res.json(resultList);
 };
 
-module.exports = { getAllPosts };
+const getExplorePosts = async (req, res) => {
+  console.log(TAG, "getExplorePosts");
+  let resultSet = new Set();
+  let array = req.body.search.split(" ");
+  array = array.map((e) => new RegExp(e));
+  const allPosts = await Post.find().populate("author");
+  for (let x of array) {
+    const posts = allPosts.filter((e) => {
+      return x.test(e.author.id) || x.test(e.author.name) || x.test(e.content);
+    });
+    for (let post of posts) {
+      resultSet.add(post);
+    }
+  }
+  const resultList = Array.from(resultSet);
+  res.json(resultList);
+};
+
+module.exports = { getAllPostsForUser, getExplorePosts };

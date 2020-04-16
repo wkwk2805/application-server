@@ -2,7 +2,7 @@ const router = require("express").Router();
 const multer = require("multer");
 const { register, modify, remove, like } = require("../middleware/post");
 const fs = require("fs");
-const { getAllPosts } = require("../read/postSelect");
+const { getExplorePosts, getAllPostsForUser } = require("../read/postSelect");
 // multer setting
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -19,7 +19,8 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 // read
-router.post("/", getAllPosts);
+router.post("/", getAllPostsForUser);
+router.post("/explore", getExplorePosts);
 // create
 router.put("/", upload.array("assets", 10), register);
 // update
